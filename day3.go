@@ -10,7 +10,7 @@ import (
 type Day3 struct {
 }
 
-func isTriangle(v1 int, v2 int, v3 int) bool {
+func (d Day3) isTriangle(v1 int, v2 int, v3 int) bool {
 	return v1+v2 > v3 && v2+v3 > v1 && v3+v1 > v2
 }
 
@@ -21,7 +21,7 @@ func (d Day3) part1() int {
 		v2, _ := strconv.Atoi(strings.TrimSpace(line[5:10]))
 		v3, _ := strconv.Atoi(strings.TrimSpace(line[10:]))
 
-		if isTriangle(v1, v2, v3) {
+		if d.isTriangle(v1, v2, v3) {
 			count++
 		}
 	}
@@ -39,9 +39,9 @@ func (d Day3) part2() int {
 
 		row = (row + 1) % 3
 		if row == 0 {
-			if isTriangle(v11, v12, v13) { count++ }
-			if isTriangle(v21, v22, v23) { count++ }
-			if isTriangle(v31, v32, v33) { count++ }
+			if d.isTriangle(v11, v12, v13) { count++ }
+			if d.isTriangle(v21, v22, v23) { count++ }
+			if d.isTriangle(v31, v32, v33) { count++ }
 		}
 
 		v11, v12 = v12, v13
