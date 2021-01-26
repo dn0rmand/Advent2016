@@ -12,6 +12,7 @@ func abs(x int) int {
 	return x
 }
 
+// Day1 link https://adventofcode.com/2016/day/1
 type Day1 struct {
 }
 
@@ -48,7 +49,7 @@ func (d Day1) part2() int {
 		}
 		found := false
 		for i := 0 ; i < value ; i++ {
-			x, y += dx, dy
+			x += dx
 			y += dy
 			yelem, ok := visited[y]
 			if !ok { 
