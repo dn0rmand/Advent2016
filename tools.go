@@ -8,6 +8,20 @@ import (
 	"strings"
 )
 
+func readline(day int) string {
+	file, err := os.Open(fmt.Sprintf("data/day%d.data", day))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	if scanner.Scan() {
+		return scanner.Text()
+	}
+	return ""
+}
+
 func readlines(day int) <-chan string {
 	channel := make(chan string)
 
