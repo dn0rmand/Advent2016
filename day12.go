@@ -12,7 +12,7 @@ func (d Day12) part1() int {
 	var a AssemBunny
 
 	a = a.load(12)
-	registers := a.run([4]int { 0, 0, 0, 0})
+	registers := a.run([4]int { 0, 0, 0, 0 }, nil)
 	return registers[0]
 }
 
@@ -20,7 +20,7 @@ func (d Day12) part2() int {
 	var a AssemBunny
 
 	a = a.load(12)
-	registers := a.run([4]int { 0, 0, 1, 0 })
+	registers := a.run([4]int { 0, 0, 1, 0 }, nil)
 	return registers[0]
 }
 

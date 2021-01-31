@@ -7,10 +7,11 @@ import (
 
 type vmContext struct {
 	ip int
+	instructions *[]instruction
 	registers *[4]int
 }
 
-type instruction func(vm *vmContext) 
+type instruction func(vm *vmContext) instruction
 
 // AssemBunny interpreter
 type AssemBunny struct {
@@ -26,59 +27,170 @@ func (asm AssemBunny) convert(value string) (bool, int) {
 	return false, v
 }
 
+func (asm AssemBunny) nop1(reg bool, value int) instruction {
+	return func(vm *vmContext) instruction { 
+		if vm == nil { return asm.inc(reg, value) }
+		vm.ip++ 
+		return nil
+	}
+}
+
+func (asm AssemBunny) nop2(reg1 bool, value1 int, reg2 bool, value2 int) instruction {
+	return func(vm *vmContext) instruction { 
+		if vm == nil { return asm.jnz(reg1, value1, reg2, value2 )}
+		vm.ip++ 
+		return nil
+	}
+}
+
+func (asm AssemBunny) cpy(reg1 bool, value1 int, reg2 bool, value2 int) instruction {
+	if (! reg2) { return asm.nop2(reg1, value1, reg2, value2) }
+	if (reg1) {
+		return func(vm *vmContext) instruction { 
+			if vm == nil { return asm.jnz(reg1, value1, reg2, value2 )}
+			vm.registers[value2] = vm.registers[value1]
+			vm.ip++
+			return nil
+		}
+	}
+
+	return func(vm *vmContext) instruction { 
+		if vm == nil { return asm.jnz(reg1, value1, reg2, value2 )}
+		vm.registers[value2] = value1
+		vm.ip++
+		return nil
+	}
+}
+
+func (asm AssemBunny) jnz(reg1 bool, value1 int, reg2 bool, value2 int) instruction {
+	if (reg1 && reg2) {
+		return func(vm *vmContext) instruction { 
+			if vm == nil { return asm.cpy(reg1, value1, reg2, value2 )}
+			if vm.registers[value1] != 0 {
+				vm.ip += vm.registers[value2]
+			} else {
+				vm.ip++
+			}
+			return nil
+		}
+	} 
+	if (reg1) {
+		return func(vm *vmContext) instruction { 
+			if vm == nil { return asm.cpy(reg1, value1, reg2, value2 )}
+			if vm.registers[value1] != 0 {
+				vm.ip += value2
+			} else {
+				vm.ip++
+			}
+			return nil
+		}
+	} 
+	if value1 == 0 { return asm.nop2(reg1, value1, reg2, value2) }
+	if reg2 {
+		return func(vm *vmContext) instruction { 
+			if vm == nil { return asm.cpy(reg1, value1, reg2, value2 )}
+			vm.ip += vm.registers[value2] 
+			return nil
+		}
+	}
+	return func(vm *vmContext) instruction { 
+		if vm == nil { return asm.cpy(reg1, value1, reg2, value2 )}
+		vm.ip += value2 
+		return nil
+	}
+}
+
+func (asm AssemBunny) inc(reg bool, value int) instruction {
+	if (! reg) { return asm.nop1(reg, value) }
+	return func(vm *vmContext) instruction { 
+		if vm == nil { return asm.dec(reg, value) }
+		vm.registers[value]++ 
+		vm.ip++;
+		return nil
+	}
+}
+
+func (asm AssemBunny) dec(reg bool, value int) instruction {
+	if (! reg) { return asm.nop1(reg, value) }
+	return func(vm *vmContext) instruction { 
+		if vm == nil { return asm.inc(reg, value) }
+		vm.registers[value]-- 
+		vm.ip++;
+		return nil
+	}
+}
+
+func (asm AssemBunny) tgz(reg bool, value int) instruction {
+	if (reg) { 
+		return func(vm *vmContext) instruction {
+			if vm == nil { return asm.inc(reg, value) }
+
+			o := vm.ip + vm.registers[value]
+			if o >= 0 && o < len(*vm.instructions) {
+				i := (*vm.instructions)[o]
+				i = i(nil) // generate toggled instruction
+				(*vm.instructions)[o] = i
+			}
+			vm.ip++;
+			return nil
+		}
+	}
+
+	return func(vm *vmContext) instruction { 
+		if vm == nil { return asm.inc(reg, value) }
+
+		o := vm.ip + value
+		if o >= 0 && o < len(*vm.instructions) {
+			i := (*vm.instructions)[o]
+			i = i(nil) // generate toggled instruction
+			(*vm.instructions)[o] = i
+		}
+		vm.ip++;
+		return nil
+	}
+}
+
+func (asm AssemBunny) parse(line string) instruction {
+	switch line[0:3] {
+		case "tgl": {
+			reg, value := asm.convert(line[4:])
+			return asm.tgz(reg, value)
+		}
+
+		case "cpy": {
+			values := strings.Split(line[4:], " ")
+			reg1, value1 := asm.convert(values[0])
+			reg2, value2 := asm.convert(values[1])
+			return asm.cpy(reg1, value1, reg2, value2);
+		} 
+
+		case "inc": {
+			reg, value := asm.convert(line[4:])
+			return asm.inc(reg, value)
+		}
+
+		case "dec": {
+			reg, value := asm.convert(line[4:])
+			return asm.dec(reg, value)
+		}
+
+		case "jnz": {
+			values := strings.Split(line[4:], " ")
+			reg1, value1 := asm.convert(values[0])
+			reg2, value2 := asm.convert(values[1])
+			return asm.jnz(reg1, value1, reg2, value2);
+		}
+
+		default:
+			return asm.nop1(false, 1)
+	}
+}
+
 func (asm AssemBunny) load(day int) AssemBunny {
 	instructions := []instruction {}
 
 	for line := range readlines(day) {
-		var ins instruction
-
-		switch line[0:3] {
-			case "cpy": {
-				_, r 		   := asm.convert(line[len(line)-1:])
-				reg, value := asm.convert(line[4:len(line)-2])
-				if reg {
-					ins = func(vm *vmContext) { 
-						vm.registers[r] = vm.registers[value] 
-						vm.ip++
-					}
-				} else {
-					ins = func(vm *vmContext) { 
-						vm.registers[r] = value 
-						vm.ip++
-					}
-				}
-			} 
-			case "inc": {
-				_, r := asm.convert(line[4:])
-				ins = func(vm *vmContext) { 
-					vm.registers[r]++ 
-					vm.ip++
-				}
-			}
-			case "dec": {
-				_, r := asm.convert(line[4:])
-				ins = func(vm *vmContext) { 
-					vm.registers[r]-- 
-					vm.ip++
-				}
-			}
-			case "jnz": {
-				values := strings.Split(line[4:], " ")
-				reg1, value1 := asm.convert(values[0])
-				reg2, value2 := asm.convert(values[1])
-
-				ins = func(vm *vmContext) { 
-					if (reg1 && vm.registers[value1] == 0) || (!reg1 && value1 == 0) {
-						vm.ip++;
-					} else if reg2 { 
-						vm.ip += vm.registers[value2]
-					} else {
-						vm.ip += value2
-					}
-				}
-			}
-		}
-
+		ins := asm.parse(line)
 		instructions = append(instructions, ins)
 	}
 
@@ -86,13 +198,17 @@ func (asm AssemBunny) load(day int) AssemBunny {
 	return asm
 }
 
-func (asm AssemBunny) run(registers [4]int) [4]int {
+func (asm AssemBunny) run(registers [4]int, preExecute func(ip int, registers *[4]int) int) [4]int {
 	asm.vm = &vmContext {
 		ip: 0,
 		registers: &registers,
+		instructions: &asm.instructions,
 	}
 
-	for asm.vm.ip < len(asm.instructions) {
+	for asm.vm.ip >= 0 && asm.vm.ip < len(asm.instructions) {
+		if preExecute != nil { asm.vm.ip = preExecute(asm.vm.ip, &registers) }
+		if asm.vm.ip < 0 || asm.vm.ip >= len(asm.instructions) { break }
+
 		ins := asm.instructions[asm.vm.ip]
 
 		ins(asm.vm)

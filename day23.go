@@ -9,15 +9,33 @@ type Day23 struct {
 }
 
 func (d Day23) part1() int {
-	// for line := range readlines(23) {
-	// }
-	return 0
+	var a AssemBunny
+
+	a = a.load(23)
+	registers := a.run([4]int { 7, 0, 0, 0 }, func(ip int, registers *[4]int) int {
+		if ip == 2 {
+			registers[0] = registers[0] * registers[1]
+			return 10
+		} else {
+			return ip
+		}
+	})
+	return registers[0]
 }
 
 func (d Day23) part2() int {
-	// for line := range readlines(23) {
-	// }
-	return 0
+	var a AssemBunny
+
+	a = a.load(23)
+	registers := a.run([4]int { 12, 0, 0, 0 }, func(ip int, registers *[4]int) int {
+		if ip == 2 {
+			registers[0] = registers[0] * registers[1]
+			return 10
+		} else {
+			return ip
+		}
+	})
+	return registers[0]
 }
 
 func (d Day23) run() {
