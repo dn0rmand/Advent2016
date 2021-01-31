@@ -16,9 +16,8 @@ func (d Day23) part1() int {
 		if ip == 2 {
 			registers[0] = registers[0] * registers[1]
 			return 10
-		} else {
-			return ip
 		}
+		return ip
 	})
 	return registers[0]
 }
@@ -31,9 +30,8 @@ func (d Day23) part2() int {
 		if ip == 2 {
 			registers[0] = registers[0] * registers[1]
 			return 10
-		} else {
-			return ip
 		}
+		return ip
 	})
 	return registers[0]
 }

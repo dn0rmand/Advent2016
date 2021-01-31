@@ -17,6 +17,7 @@ type instruction func(vm *vmContext) instruction
 type AssemBunny struct {
 	vm *vmContext
 	instructions []instruction
+	output func(value int) bool
 }
 
 func (asm AssemBunny) convert(value string) (bool, int) {
@@ -150,6 +151,36 @@ func (asm AssemBunny) tgz(reg bool, value int) instruction {
 	}
 }
 
+func (asm AssemBunny) out(reg bool, value int) instruction {
+	if (reg) {
+		return func(vm *vmContext) instruction {
+			if vm == nil { return asm.inc(reg, value) }
+			
+			if asm.output != nil { 
+				if (asm.output(vm.registers[value])) {
+					vm.ip = 1000; // terminate
+				}
+			}
+
+			vm.ip++
+			return nil
+		}
+	}
+
+	return func(vm *vmContext) instruction {
+		if vm == nil { return asm.inc(reg, value) }
+
+		if asm.output != nil { 
+			if (asm.output(value)) {
+				vm.ip = 1000; // terminate
+			}
+		}
+
+		vm.ip++
+		return nil
+	}
+}
+
 func (asm AssemBunny) parse(line string) instruction {
 	switch line[0:3] {
 		case "tgl": {
@@ -179,6 +210,11 @@ func (asm AssemBunny) parse(line string) instruction {
 			reg1, value1 := asm.convert(values[0])
 			reg2, value2 := asm.convert(values[1])
 			return asm.jnz(reg1, value1, reg2, value2);
+		}
+
+		case "out": {
+			reg, value := asm.convert(line[4:])
+			return asm.out(reg, value)
 		}
 
 		default:

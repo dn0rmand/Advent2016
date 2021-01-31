@@ -9,20 +9,34 @@ type Day25 struct {
 }
 
 func (d Day25) part1() int {
-	// for line := range readlines(25) {
-	// }
-	return 0
-}
+	var a AssemBunny
 
-func (d Day25) part2() int {
-	// for line := range readlines(25) {
-	// }
-	return 0
+	next := 0
+	count:= 0
+
+	a.output = func(value int) bool { 
+		if next != value {
+			return true
+		}
+		next = (next+1) % 2
+		count++
+		return count > 100
+	}
+
+	a = a.load(25)
+
+	for regA := 1; ; regA++ { 
+		next = 0
+		count = 0
+		a.run([4]int { regA, 0, 0, 0 }, nil)
+		if count > 100 { 
+			return regA 
+		}
+	}
 }
 
 func (d Day25) run() {
 	fmt.Println()
 	fmt.Printf("--- Day 25 ---\n")
 	fmt.Printf("Answer to day 25 part 1 is %v\n", d.part1())
-	fmt.Printf("Answer to day 25 part 2 is %v\n", d.part2())
 }

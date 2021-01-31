@@ -29,5 +29,5 @@ func main() {
 	// Day22{}.run()
 	Day23{}.run()
 	// Day24{}.run()
-	// Day25{}.run()
+	Day25{}.run()
 }
