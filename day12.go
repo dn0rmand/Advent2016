@@ -9,15 +9,19 @@ type Day12 struct {
 }
 
 func (d Day12) part1() int {
-	// for line := range readlines(12) {
-	// }
-	return 0
+	var a AssemBunny
+
+	a = a.load(12)
+	registers := a.run([4]int { 0, 0, 0, 0})
+	return registers[0]
 }
 
 func (d Day12) part2() int {
-	// for line := range readlines(12) {
-	// }
-	return 0
+	var a AssemBunny
+
+	a = a.load(12)
+	registers := a.run([4]int { 0, 0, 1, 0 })
+	return registers[0]
 }
 
 func (d Day12) run() {
