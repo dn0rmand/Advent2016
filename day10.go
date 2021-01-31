@@ -27,9 +27,8 @@ func (d *day10List) pop() int {
 		d.front = d.front.next
 		d.count--
 		return v
-	} else {
-		return -1
 	}
+	return -1
 }
 
 type day10Bot struct {
