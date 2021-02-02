@@ -17,7 +17,7 @@ func main() {
 	Day10{}.run()
 	// Day11{}.run() // slow
 	Day12{}.run()
-	// Day13{}.run()
+	Day13{}.run()
 	// Day14{}.run()
 	// Day15{}.run()
 	// Day16{}.run()
