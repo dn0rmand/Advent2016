@@ -18,9 +18,9 @@ func main() {
 	// Day11{}.run() // slow
 	Day12{}.run()
 	Day13{}.run()
-	// Day14{}.run()
-	// Day15{}.run()
-	// Day16{}.run()
+	// Day14{}.run() // slow due to MD5
+	Day15{}.run()
+	Day16{}.run()
 	// Day17{}.run()
 	// Day18{}.run()
 	// Day19{}.run()
