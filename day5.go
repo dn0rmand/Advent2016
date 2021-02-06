@@ -9,15 +9,17 @@ import (
 
 // Day5 link https://adventofcode.com/2016/day/5
 type Day5 struct {
+	done bool
 }
 
-func (d Day5) getHashes() chan []byte {
+func (d *Day5) getHashes() chan []byte {
 	channel := make(chan []byte)
 	prefix := readline(5)
 	hasher := md5.New()
 
 	go func() {
 		for i := 0; ; i++ {
+			if d.done { break }
 			hasher.Reset()
 			hasher.Write([]byte(prefix))
 			hasher.Write([]byte(strconv.Itoa(i)))
@@ -26,6 +28,8 @@ func (d Day5) getHashes() chan []byte {
 				channel <- hash
 			}
 		} 
+		channel <- []byte {}
+		close(channel)
 	}()
 
 	return channel
@@ -70,7 +74,11 @@ func (d Day5) parts() (string, string) {
 		if password1.Len()==8 && found == 8 { break }
 	}
 
-	close(channel)
+	// purge
+	d.done = true
+	for value := range channel {
+		if len(value) == 0 { break }
+	}
 
 	return password1.String(), d.runesToString(password2)
 }
@@ -79,6 +87,6 @@ func (d Day5) run() {
 	fmt.Println()
 	fmt.Printf("--- Day 5 ---\n")
 	var pwd1, pwd2 = d.parts()
-	fmt.Printf("Answer to day 5 part 1 is %v\n", pwd1)
+	fmt.Printf("\rAnswer to day 5 part 1 is %v\n", pwd1)
 	fmt.Printf("Answer to day 5 part 2 is %v\n", pwd2)
 }

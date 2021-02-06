@@ -197,8 +197,10 @@ func (d Day14) part2() int {
 	index := -1
 	for i := 1; i <= 64; i++ {
 		index = d.getNextIndex(index+1)
+		fmt.Printf("\rIndex %v for key %v", index, i)
 	}
 
+	fmt.Print("\r                               \r")
 	d.part2Done = true
 	// purge
 	for value := range d.channel {
