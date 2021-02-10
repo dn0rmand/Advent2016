@@ -37,7 +37,7 @@ func main() {
 	exec(Day2{})
 	exec(Day3{})
 	exec(Day4{})
-	exec(Day5{}) // very slow due to MD5
+	// exec(Day5{}) // very slow due to MD5
 	exec(Day6{})
 	exec(Day7{})
 	exec(Day8{})
@@ -46,17 +46,17 @@ func main() {
 	// exec(Day11{}) // slow
 	exec(Day12{})
 	exec(Day13{})
-	exec(Day14{}) // slow due to MD5
+	// exec(Day14{}) // slow due to MD5
 	exec(Day15{})
 	exec(Day16{})
 	exec(Day17{})
-	// exec(Day18{})
-	// exec(Day19{})
-	// exec(Day20{})
-	// exec(Day21{})
-	// exec(Day22{})
+	exec(Day18{})
+	exec(Day19{})
+	exec(Day20{})
+	exec(Day21{})
+	exec(Day22{})
 	exec(Day23{})
-	// exec(Day24{})
+	exec(Day24{})
 	exec(Day25{})
 
 	end := time.Now()
