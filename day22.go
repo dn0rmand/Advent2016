@@ -91,7 +91,7 @@ func (d Day22) part2() int {
 	for len(states) > 0 {		
 		steps++
 		nextStates := make(map[int]int)
-		for key, _ := range states {
+		for key := range states {
 			y := key % 100
 			x := (key - y) / 100
 

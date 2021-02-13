@@ -43,7 +43,7 @@ func main() {
 	exec(Day8{})
 	exec(Day9{})
 	exec(Day10{})
-	exec(Day11{}) // slow
+	exec(Day11{})
 	exec(Day12{})
 	exec(Day13{})
 	exec(Day14{}) // slow due to MD5

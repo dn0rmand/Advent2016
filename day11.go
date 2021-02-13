@@ -145,28 +145,32 @@ func (d day11State) next() []day11State {
 
 func (d day11State) getKey() string {
 	sort.Slice(d.objects, func(i, j int) bool { 
-		if d.objects[i].floor == d.objects[j].floor {
-			if d.objects[i].id == d.objects[j].id {
+		if d.objects[i].id == d.objects[j].id {
 				return d.objects[i].microship < d.objects[j].microship 
-			}
-			return d.objects[i].id < d.objects[j].id 
 		}
-		return d.objects[i].floor < d.objects[j].floor
+		return d.objects[i].id < d.objects[j].id 
 	})
 
-	var key strings.Builder
+	values := []string { string([]byte { d.elevator + '0' }) }
 
-	const C0 = byte('0')
+	for i := 0; i < len(d.objects); i += 2 {
+		o1 := d.objects[i]
+		o2 := d.objects[i+1]
 
-	key.WriteByte(d.elevator+C0)
-	for _, o := range d.objects {
-		// key.WriteRune(':')
-		key.WriteByte(o.id+C0)
-		key.WriteByte(o.microship+C0)
-		key.WriteByte(o.floor+C0)
+		var k []byte
+
+		if o1.floor == o2.floor {
+			k = []byte { 'P', '0'+o1.floor }
+		} else {
+			k = []byte { 'D', '0'+o1.floor, '0'+o2.floor }
+		}
+
+		values = append(values, string(k))
 	}
 
-	k := key.String()
+	sort.Sort(sort.StringSlice(values))
+
+	k := strings.Join(values, "")
 	return k
 }
 
@@ -183,7 +187,6 @@ func (d Day11) process(objects []day11Object) int {
 	visited[states[0].getKey()] = 1
 	for len(states) > 0 {
 		steps++
-		fmt.Printf("\r %v - %v\r", steps, len(states))
 		var nextStates []day11State
 
 		for _, state := range states {
