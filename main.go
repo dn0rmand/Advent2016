@@ -27,9 +27,9 @@ func exec(d day) {
 }
 
 func main() {
-	println("############################")
-	println("# Avent of Code 2016 in Go #")
-	println("############################")
+	println("#############################")
+	println("# Advent of Code 2016 in Go #")
+	println("#############################")
 
 	start := time.Now()
 
